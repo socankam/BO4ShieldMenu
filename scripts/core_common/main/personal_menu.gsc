@@ -1,18 +1,5 @@
 PersonalMenu(){
-    self createMenu("PersonalMenu", "Personal Menu");
-    self addOption("PersonalMenu", "Personal Options", &OpenSubMenu, "PersonalOptions");
-    self addOption("PersonalMenu", "Misc. Fun Menu", &OpenSubMenu, "FunOptions");
-    if(Multiplayer()){
-        self addOption("PersonalMenu", "Enemy Spawn Menu", &OpenSubMenu, "SpawnEnemies");
-        self addOption("PersonalMenu", "Specialist Menu", &OpenSubMenu, "SpecialistMenu");
-        self addOption("PersonalMenu", "Scorestreak Menu", &OpenSubMenu, "KillstreaksMenu");
-    }
-    if(Blackout()){
-        self addOption("PersonalMenu", "Armor Menu", &OpenSubMenu, "ArmorMenu");
-    }
-    self addOption("PersonalMenu", "Perk Menu", &OpenSubMenu, "PerkMenu");
-
-    self createMenu("PersonalOptions", "Personal Options");
+    self createMenu("PersonalOptions", "Basic Mods Menu");
     self addToggleOption("PersonalOptions", "God Mode", &GodMode, false);
     self addToggleOption("PersonalOptions", "Infinite UAV", &InfiniteUAV, false);
     self addToggleOption("PersonalOptions", "Unlimited Ammo", &UnlimitedAmmo, false);
@@ -46,7 +33,7 @@ PersonalMenu(){
     self addToggleOption("FunOptions", "Invisible Weapon", &HideWeapon, false);
     self addOption("FunOptions", "Bare Hands", &GivePlayerWeapon, "bare_hands");
     self addOption("FunOptions", "Earthquake", &DoEarthquake, []);
-    self addOption("FunOptions", "Print Position", &PrintPosition, []);
+    self addOption("FunOptions", "Enemy Spawn Menu", &OpenSubMenu, "SpawnEnemies");
 
     self createMenu("SpawnEnemies", "Spawn Enemies");
     if(level.CurrentMap == "mp_nuketown_4"){
@@ -54,7 +41,7 @@ PersonalMenu(){
         self addOption("SpawnEnemies", "Spawn Horde Of Zombie Mannequins (Spam = Crash)", &ZombieMannequin, "15");
     }
     self addOption("SpawnEnemies", "Spawn Attack Robot", &EnemyAI, "spawner_bo3_robot_grunt_assault_mp");
-    //self addOption("SpawnEnemies", "Spawn Swat Team Member", &EnemyAI, "spawner_mp_swat_buddy_team1_male");
+    self addOption("SpawnEnemies", "Spawn Swat Team Member", &EnemyAI, "spawner_mp_swat_buddy_team1_male");
 
     self createMenu("SpecialistMenu", "Specialist Menu");
     if (!isDefined(self.customzombies)){
@@ -76,11 +63,19 @@ PersonalMenu(){
     }
 
     self createMenu("KillstreaksMenu", "Scorestreaks");
+    self addOption("KillstreaksMenu", "Call In Gunship", &GivePlayerWeapon, "inventory_ac130");
+    self addOption("KillstreaksMenu", "Call In Strike Team", &GivePlayerWeapon, "inventory_swat_team");
     self addOption("KillstreaksMenu", "Call In UAV", &GivePlayerWeapon, "uav");
-    self addOption("KillstreaksMenu", "Call In Counter UAV", &GivePlayerWeapon, "counteruav");
+    self addOption("KillstreaksMenu", "Call In Counter UAV", &GivePlayerWeapon, "inventory_counteruav");
     self addOption("KillstreaksMenu", "Call In Drone Squadron", &GivePlayerWeapon, "drone_squadron");
     self addOption("KillstreaksMenu", "Call In Snipers Nest", &GivePlayerWeapon, "overwatch_helicopter");
     self addOption("KillstreaksMenu", "Call In Thresher", &GivePlayerWeapon, "straferun");
+    self addOption("KillstreaksMenu", "Call In Mantis", &GivePlayerWeapon, "inventory_ai_tank_marker");
+    self addOption("KillstreaksMenu", "Call In Attack Helicopter", &GivePlayerWeapon, "inventory_helicopter_comlink");
+    self addOption("KillstreaksMenu", "Call In Lightning Strike", &GivePlayerWeapon, "inventory_planemortar");
+    self addOption("KillstreaksMenu", "Call In Sentry Gun", &GivePlayerWeapon, "inventory_ultimate_turret");
+    self addOption("KillstreaksMenu", "Call In RCXD", &GivePlayerWeapon, "inventory_recon_car");
+    self addOption("KillstreaksMenu", "Call In Dart", &GivePlayerWeapon, "inventory_dart");
 
     self createMenu("ArmorMenu", "Armor Menu");
     self addOption("ArmorMenu", "Set Level 1 Armor", &SetToPlayer, "specialty_armor,Armor");
@@ -147,7 +142,7 @@ ZombieMannequin(Amount)
     }
 }
 
-EnemyAI()
+EnemyAI(Enemy)
 {
     Position = self.origin;
     Angles = self.angles;
@@ -163,17 +158,21 @@ EnemyAI()
         var_e5031929 setmodel("tag_origin");
         var_e5031929.angles = (0, 0, 0);
 
-        Enemy = spawnactor("spawner_bo3_robot_grunt_assault_mp", SpawnPosition, Angles, "swat", 1, 1);
+        Enemy = spawnactor(Enemy, SpawnPosition, Angles, "enemy", 1, 1);
 
         Enemy.var_e5031929 = var_e5031929;
-
-        EnemySpeed = randomint(100);
-        if (EnemySpeed <= 35) {
-            Enemy.zombie_move_speed = "walk";
-        } else if (EnemySpeed <= 70) {
-            Enemy.zombie_move_speed = "run";
-        } else {
-            Enemy.zombie_move_speed = "sprint";
+        if(Enemy == "spawner_bo3_robot_grunt_assault_mp"){
+            EnemySpeed = randomint(100);
+            if (EnemySpeed <= 35) {
+                Enemy.zombie_move_speed = "walk";
+            } else if (EnemySpeed <= 70) {
+                Enemy.zombie_move_speed = "run";
+            } else {
+                Enemy.zombie_move_speed = "sprint";
+            }
+        }
+        else{
+            continue;
         }
     }
 }
@@ -635,9 +634,4 @@ vector_scal(vec, scale)
 DoEarthquake()
 {
     earthquake( 0.6, 5, self.origin, 1000000 );
-}
-
-PrintPosition(){
-    pos = self.origin;
-    self iPrintlnBold("Position: X=" + pos[0] + " Y=" + pos[1] + " Z=" + pos[2]);
 }

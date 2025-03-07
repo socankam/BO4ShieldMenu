@@ -65,17 +65,29 @@ setScrollerIcon(newScrollerIcon) {
     self.icon = newScrollerIcon;
     if(self.ShieldClient){
         if(self.icon == "") self iPrintln("Scroller icon set blank");
-        else self iPrintln("Scroller icon set to: " + newScrollerIcon);
+        else self iPrintlnBold("Scroller icon set to: " + self.icon);
     }
     else{
         if(self.icon == "") self iPrintlnBold("Scroller icon set blank");
-        else self iPrintlnBold("Scroller icon set to: " + newScrollerIcon);
+        else self iPrintlnBold("Scroller icon set to: " + self.icon);
     }
 }
 
 setPrimaryColor(newPrimaryColor) {
     self.primaryColor = newPrimaryColor;
     MenuHUDS();
+    self notify("menu_closed");
+    ScrollingTextHUD();
+    if (isDefined(self.DVDText)){
+        self notify("stop_bounce");
+        self.DVDText = true;
+        thread BouncingText();
+    }
+    if (isDefined(self.DoHeart)){
+        self notify("stop_doheart");
+        self.DoHeart = true;
+        thread DoHeartText();
+    }
 }
 
 setSecondaryColor(newSecondaryColor) {
@@ -83,6 +95,16 @@ setSecondaryColor(newSecondaryColor) {
     MenuHUDS();
     self notify("menu_closed");
     ScrollingTextHUD();
+    if (isDefined(self.DVDText)){
+        self notify("stop_bounce");
+        self.DVDText = true;
+        thread BouncingText();
+    }
+    if (isDefined(self.DoHeart)){
+        self notify("stop_doheart");
+        self.DoHeart = true;
+        thread DoHeartText();
+    }
 }
 
 SoundEffect(){

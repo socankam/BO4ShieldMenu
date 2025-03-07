@@ -11,7 +11,7 @@ onPlayerConnect() {
     //Every time you add a new menu to the main menu, do it here as well.
     level.MainMenuRegistry = []; //Main Menu
     level.MainMenuRegistry["Server Menu"] = &ServerMenu;
-    level.MainMenuRegistry["Personal Menu"] = &PersonalMenu;
+    level.MainMenuRegistry["Personal Menu"] = &PersonalMenu; // A few menus are initiated in this 1 .gsc
     level.MainMenuRegistry["Weapon Options"] = &WeaponsMenu;
     level.MainMenuRegistry["Vehicle Menu"] = &VehicleMenu;
     level.MainMenuRegistry["Zombies Menu"] = &ZombieMenu;
@@ -21,13 +21,14 @@ onPlayerConnect() {
     level.MainMenuRegistry["All Players Menu"] = &AllPlayersMenu;
     level.MainMenuRegistry["Account Menu"] = &AccountMenu;
     level.MainMenuRegistry["Customization Menu"] = &CustomizationMenu;
+    level.MainMenuRegistry["Dev Menu"] = &DevMenu;
 
-    // Custom zombies
+    // For Custom zombies
     level.MainMenuRegistry["Buy Station"] = &BuyStation;
     level.MainMenuRegistry["Cheat Menu"] = &CheatMenu;
 
-    self.primaryColor = "^7";
-    self.secondaryColor = "^2";
+    self.primaryColor = "^5";
+    self.secondaryColor = "^7";
     self.icon = "";
 
     if(self isHost()){ self.ShieldClient = true; // Obviously
@@ -182,34 +183,38 @@ refreshMenuDisplay(menuKey) {
 
         if (endIndex > numOptions) endIndex = numOptions;
 
-        for (i = startIndex; i < endIndex; i++) {
-            option = menu["options"][i];
-            str = self.primaryColor + option[0];
+    for (i = startIndex; i < endIndex; i++) {
+        option = menu["options"][i];
+        str = self.primaryColor + option[0];
 
-            if (isDefined(option[3])) {
-                str = str + " " + option[3];
-            }
-
-            if (i == self.menu["currentIndex"]) {
-                if(self.icon == "") str = self.secondaryColor + "-> [ " + str + self.secondaryColor + " ] <-";
-                else str = self.secondaryColor + self.icon + " [ " + str + self.secondaryColor + " ] " + self.icon;
-            }
-
-            hudElemName = "MenuLine" + i;
-
-            ShieldRegisterHudElem(
-                hudElemName,
-                "",
-                0xFFFFC0EB,
-                self.Left, self.Top + 300,
-                2, 1,
-                1, 1,
-                0.5
-            );
-
-            ShieldHudElemSetText(hudElemName, str);
-            self.Top += self.tsize;
+        if (isDefined(option[3])) {
+            str = str + " " + option[3];
         }
+
+        fontSize = 0.5;
+
+        if (i == self.menu["currentIndex"]) {
+            if (self.icon == "") str = self.secondaryColor + "-> [ " + str + self.secondaryColor + " ] <-";
+            else str = self.secondaryColor + self.icon + " [ " + str + self.secondaryColor + " ] " + self.icon;
+            
+            fontSize = 0.6;
+        }
+
+        hudElemName = "MenuLine" + i;
+
+        ShieldRegisterHudElem(
+            hudElemName,
+            "",
+            0xFFFFC0EB,
+            self.Left, self.Top + 300,
+            2, 1,
+            1, 1,
+            fontSize
+        );
+
+        ShieldHudElemSetText(hudElemName, str);
+        self.Top += self.tsize;
+    }
 
         ShieldRegisterHudElem(
             #"Footer",
@@ -267,7 +272,6 @@ refreshMenuDisplay(menuKey) {
     }
 }
 
-
 CallFunction(function, params) {
     if (!isDefined(function))
         return;
@@ -312,7 +316,9 @@ monitorMenuInput() {
     while (true) {
         if(self getStance() == "crouch" && self FragButtonPressed()){
             if (!isDefined(self.menu["items"]["Main"]["menuIsOpen"]) || !self.menu["items"]["Main"]["menuIsOpen"]) {
-                self thread ScrollingTextHUD();
+                SetDvar( "cg_drawCrosshair", 0 );
+                thread ScrollingTextHUD();
+                ShieldRemoveHudElem("ScrollingText");
                 if(isDefined(self.MenuBlur) && self.MenuBlur) self SetBlur(13, .01);
                 if(isDefined(self.Briefcase) && self.Briefcase){
                     self.savedWeapon = self getCurrentWeapon();
@@ -346,6 +352,16 @@ addToggleOption(menuKey, name, func, initialState) {
     menu = self.menu["items"][menuKey];
     count = menu["options"].size;
 
+    if (!isDefined(self.menu["dynamicVars"])) {
+        self.menu["dynamicVars"] = [];
+    }
+
+    if (isDefined(self.menu["dynamicVars"][name])) {
+        initialState = self.menu["dynamicVars"][name];
+    } else {
+        self.menu["dynamicVars"][name] = initialState;
+    }
+
     menu["options"][count] = [];
     menu["options"][count][0] = name;
     menu["options"][count][1] = func;
@@ -353,16 +369,7 @@ addToggleOption(menuKey, name, func, initialState) {
     
     menu["options"][count][3] = initialState ? "^2[ON]" : "^1[OFF]";
     menu["options"][count][4] = initialState;
-
-    if (!isDefined(self.menu["dynamicVars"])) {
-        self.menu["dynamicVars"] = [];
-    }
-
-    if (!isDefined(self.menu["dynamicVars"][name])) {
-        self.menu["dynamicVars"][name] = initialState;
-    }
 }
-
 toggleBoolOption(menuKey) {
     menu = self.menu["items"][menuKey];
     if (!isDefined(menu)) {
@@ -370,7 +377,7 @@ toggleBoolOption(menuKey) {
     }
 
     selectedOption = menu["options"][self.menu["currentIndex"]];
-    if (!isDefined(selectedOption)) {
+    if (!isDefined(selectedOption) || !isDefined(selectedOption[4])) {
         return;
     }
 
@@ -421,20 +428,29 @@ setupMenu() {
 
     self createMenu("Main", "Main Menu");
     if(self isHost()) self addOption("Main", "Server Menu", &OpenSubMenu, "ServerMenu");
-    if (!isDefined(self.customzombies)){
-        self addOption("Main", "Personal Menu", &OpenSubMenu, "PersonalMenu");
-        self addOption("Main", "Weapons Menu", &OpenSubMenu, "WeaponOptions");
-        self addOption("Main", "Vehicle Menu", &OpenSubMenu, "VehicleMenu");
-        self addOption("Main", "Zombies Menu", &OpenSubMenu, "ZombieMenu");
-        self addOption("Main", "Teleport Menu", &OpenSubMenu, "TeleportMenu");
-        self addOption("Main", "Character Menu", &OpenSubMenu, "CharacterMenu");
-        self addOption("Main", "Forge Menu", &OpenSubMenu, "ForgeMenu");
-        self addOption("Main", "All Players Menu", &OpenSubMenu, "AllPlayersMenu");
-        self addOption("Main", "Config. Menu", &OpenSubMenu, "CustomizationMenu");
-    }
     if(Zombies()) self addOption("Main", "Account Menu ^BBUTTON_COD_POINT_ICON^", &OpenSubMenu, "AccountMenu");
+    if (!isDefined(self.customzombies)){
+        self addOption("Main", "Basic Mods Menu", &OpenSubMenu, "PersonalOptions");
+        self addOption("Main", "Fun Options Menu", &OpenSubMenu, "FunOptions");
+        if(Multiplayer()){
+            self addOption("Main", "Specialist Menu", &OpenSubMenu, "SpecialistMenu");
+            self addOption("Main", "Scorestreak Menu", &OpenSubMenu, "KillstreaksMenu");
+        }
+        self addOption("Main", "Weapons Menu", &OpenSubMenu, "WeaponOptions");
+        self addOption("Main", "Character Menu", &OpenSubMenu, "CharacterMenu");
+        self addOption("Main", "Vehicle Menu", &OpenSubMenu, "VehicleMenu");
+        if(Zombies() || Blackout()) self addOption("Main", "Zombies Menu", &OpenSubMenu, "ZombieMenu");
+        self addOption("Main", "Teleport Menu", &OpenSubMenu, "TeleportMenu");
+        self addOption("Main", "Forge Menu", &OpenSubMenu, "ForgeMenu");
+        if(Blackout()){
+            self addOption("Main", "Armor Menu", &OpenSubMenu, "ArmorMenu");
+        }
+        self addOption("Main", "Perk Menu", &OpenSubMenu, "PerkMenu");
+        self addOption("Main", "All Players Menu", &OpenSubMenu, "AllPlayersMenu");
+        self addOption("Main", "Configuration Menu", &OpenSubMenu, "CustomizationMenu");
+        self addOption("Main", "Dev Menu", &OpenSubMenu, "DevMenu");
+    }
 
-    
     foreach (menuKey, initFunction in level.MainMenuRegistry) {
         self thread [[initFunction]]();
     }
@@ -452,6 +468,7 @@ OpenSubMenu(menuKey) {
 CloseMenu() {
     self notify("menu_closed");
 
+    SetDvar( "cg_drawCrosshair", 1 );
     if (isDefined(self.savedWeapon)) {
         self giveWeapon(self.savedWeapon);
         wait 0.1;

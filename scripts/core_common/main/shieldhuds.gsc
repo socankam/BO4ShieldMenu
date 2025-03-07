@@ -79,19 +79,132 @@ MenuHUDS(){
         for (i = 0; i < 2; i++) ShieldHudElemSetText(#"Y3" + i, self.primaryColor + "|");
 }
 
+DoHeartText()
+{
+    self endon("stop_doheart");
+    hudElemName = "DoHeart";
+
+    x = -2290;
+    y = 60;
+    minFontSize = 0.5;
+    maxFontSize = 2.0;
+    fontSize = minFontSize;
+    fontSizeSpeed = 0.1;
+
+    ShieldRegisterHudElem(
+        hudElemName,
+        "",
+        0xFFFFC0EB,
+        x, y,
+        2, 1,
+        1, 1,
+        1
+    );
+
+    while (isDefined(self.DoHeart))
+    {
+        fontSize = fontSize + fontSizeSpeed;
+
+        if (fontSize >= maxFontSize || fontSize <= minFontSize)
+        {
+            fontSizeSpeed = fontSizeSpeed * -1;
+        }
+
+        ShieldRegisterHudElem(
+            hudElemName,
+            "",
+            0xFFFFC0EB,
+            x, y,
+            2, 1,
+            1, 1,
+            fontSize
+        );
+
+        ShieldHudElemSetText(hudElemName, self.primaryColor + "Shield " + self.secondaryColor + "<3");
+
+        wait 0.05;
+    }
+}
+
+BouncingText()
+{
+    self endon("stop_bounce");
+    hudElemName = "BouncingText";
+
+    x = -530;
+    y = 0;
+    xSpeed = 5;
+    ySpeed = 3;
+    maxX = -1150;
+    maxY = 95;
+
+    minX = -1 * maxX;
+    minX = minX + 50;
+    minY = -1 * maxY;
+    minY = minY + 50;
+
+    ShieldRegisterHudElem(
+        hudElemName,
+        "",
+        0xFFFFC0EB,
+        x, y,
+        2, 1,
+        1, 1,
+        1
+    );
+
+    while (isDefined(self.DVDText))
+    {
+        x = x + xSpeed;
+        y = y + ySpeed;
+
+        if (x >= maxX)  
+        {
+            xSpeed = xSpeed * -1;
+        }
+        if (x <= minX)  
+        {
+            xSpeed = xSpeed * -1;
+        }
+
+        if (y >= maxY)  
+        {
+            ySpeed = ySpeed * -1;
+        }
+        if (y <= minY)  
+        {
+            ySpeed = ySpeed * -1;
+        }
+
+        ShieldRegisterHudElem(
+            hudElemName,
+            "",
+            0xFFFFC0EB,
+            x, y,
+            2, 1,
+            1, 1,
+            0.5
+        );
+
+        ShieldHudElemSetText(hudElemName, self.primaryColor + "Shield Menu " + self.secondaryColor + "v1.0");
+
+        wait 0.05;
+    }
+}
+
 ScrollingTextHUD()
 {
         self endon("menu_closed");
 
         hudElemName = "ScrollingText";
         
-        x = -870;
+        x = -820;
         y = 67 + 300;
         speed = 5;
-        maxX = -675;
+        maxX = -695;
         
         textArray = [];
-        textArray[0] = self.secondaryColor + "Shoot ";
+        textArray[0] = self.secondaryColor + "^BHUD_OBIT_DEATH_SUICIDE^ Shoot ";
         textArray[1] = self.primaryColor + "= down | ";
         textArray[2] = self.secondaryColor + "Aim ";
         textArray[3] = self.primaryColor + "= up | ";
@@ -299,26 +412,11 @@ CountdownHUD()
     );
 }
 
-FormatPoints(points)
-{
-    if (points < 10)
-        return "00000" + points;
-    else if (points < 100)
-        return "0000" + points;
-    else if (points < 1000)
-        return "000" + points;
-    else if (points < 10000)
-        return "00" + points;
-    else if (points < 100000)
-        return "0" + points;
-    else
-        return points;
-}
-
 ClearMenuHUDs(){
     ShieldRemoveHudElem(#"Header");
     ShieldRemoveHudElem(#"Footer");
     ShieldRemoveHudElem("ScrollingText");
+    ShieldRemoveHudElem("BouncingText");
     for (i = 0; i < 100; i++) ShieldRemoveHudElem("MenuLine" + i);
     for (i = 0; i < 100; i++) ShieldRemoveHudElem(#"TitleBar" + i);
     for (i = 0; i < 120; i++) ShieldRemoveHudElem(#"FooterBar" + i);

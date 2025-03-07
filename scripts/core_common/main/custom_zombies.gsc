@@ -75,24 +75,6 @@ StartCountdown()
     thread StartRound();
 }
 
-CreateHUDS()
-{
-    x = -355;
-    y = 500;
-
-    self.TextSize = 1;
-    ShieldRegisterHudElem(
-        #"Round",
-        "",
-        0,
-        x, y,
-        2, 1,
-        1, 1,
-        self.TextSize
-    );
-    ShieldHudElemSetText(#"Round", "^3");
-}
-
 StartRound()
 {
     DoEarthquake();
@@ -240,8 +222,7 @@ SpawnNewZombie(player)
     ZombieSpeed = randomint(100);
     RoundSpeedChance = level.currentRound * 5;
 
-    if(Blackout()) Sprints = array("sprint", "super_sprint", "super_super_sprint");
-    if(Multiplayer()) Sprints = array("sprint", "super_sprint");
+    Sprints = array("sprint", "super_sprint", "super_super_sprint");
     Zombies = getaiteamarray();
 
     foreach (CurrentZombie in Zombies) {
@@ -493,6 +474,22 @@ SpawnBrutus(player)
     }
 
     thread MonitorZombie(Brutus, player);
+}
+
+FormatPoints(points)
+{
+    if (points < 10)
+        return "00000" + points;
+    else if (points < 100)
+        return "0000" + points;
+    else if (points < 1000)
+        return "000" + points;
+    else if (points < 10000)
+        return "00" + points;
+    else if (points < 100000)
+        return "0" + points;
+    else
+        return points;
 }
 
 PlayerSettings(player){

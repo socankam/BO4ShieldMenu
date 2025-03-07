@@ -1,15 +1,17 @@
 //Thanks to ATE for the camo values, etc.
 WeaponsMenu(){
     self createMenu("WeaponOptions", "Weapons Menu");
-    self addOption("WeaponOptions", "Ammo Modifications Menu", &OpenSubMenu, "AmmoModifications");
     self addOption("WeaponOptions", "Give Weapon", &OpenSubMenu, "WeaponsMenu");
     self addOption("WeaponOptions", "Camo Menu", &OpenSubMenu, "CamoMenu");
+    self addOption("WeaponOptions", "Ammo Modifier Menu", &OpenSubMenu, "AmmoModifications");
     
     self createMenu("AmmoModifications", "Ammo Mods");
-    self addToggleOption("AmmoModifications", "Enable Ammo Modifier", &AmmoModifier, false);
+    self addToggleOption("AmmoModifications", "Enable Ammo Mod", &AmmoModifier, false);
     self addOption("AmmoModifications", "Shoot Rockets", &SetAmmoMod, "launcher_standard_t8");
     self addOption("AmmoModifications", "Shoot Raygun Ammo", &SetAmmoMod, "ray_gun");
     self addOption("AmmoModifications", "Shoot Paladin HB50 Ammo", &SetAmmoMod, "sniper_powerbolt_t8");
+    self addOption("AmmoModifications", "Shoot MOG 12 Ammo", &SetAmmoMod, "shotgun_pump_t8");
+    self addOption("AmmoModifications", "Shoot Vendetta Ammo", &SetAmmoMod, "sniper_mini14_t8");
     if(Blackout())
     {
         self addOption("AmmoModifications", "Shoot Savage Impaler Ammo", &SetAmmoMod, "ww_crossbow_impaler_t8");
@@ -24,6 +26,7 @@ WeaponsMenu(){
     }
 
     self createMenu("WeaponsMenu", "Give Weapon");
+    if(Blackout()) self addOption("WeaponsMenu", "Operator Mod Weapons", &OpenSubMenu, "OperatorMods");
     self addOption("WeaponsMenu", "Special Weapons", &OpenSubMenu, "SpecialWeapons");
     self addOption("WeaponsMenu", "Assault Rifles", &OpenSubMenu, "AssaultRifles");
     self addOption("WeaponsMenu", "Sub Machine Guns", &OpenSubMenu, "SubMachineGuns");
@@ -32,10 +35,28 @@ WeaponsMenu(){
     self addOption("WeaponsMenu", "Light Machine Guns", &OpenSubMenu, "LightMachineGuns");
     self addOption("WeaponsMenu", "Shotguns", &OpenSubMenu, "Shotguns");
     self addOption("WeaponsMenu", "Pistols", &OpenSubMenu, "Pistols");
+    if(Blackout() || Multiplayer()) self addOption("WeaponsMenu", "Melee Weapons", &OpenSubMenu, "Melee");
 
     self createMenu("SpecialWeapons", "Special Weapons");
     self addOption("SpecialWeapons", "Raygun Varients", &OpenSubMenu, "Rayguns");
     self addOption("SpecialWeapons", "Other Wonder Weapons", &OpenSubMenu, "WonderWeapons");
+    if(Blackout()){
+        self addOption("SpecialWeapons", "Give Basketball", &GivePlayerWeapon, "basketball");
+    }
+
+    self createMenu("OperatorMods", "Operator Mod Weapons");
+    self addOption("OperatorMods", "Give Maddox RFB Operator", &GivePlayerWeapon, "ar_fastfire_t8_operator");
+    self addOption("OperatorMods", "Give VAPR-XKG Operator", &GivePlayerWeapon, "ar_stealth_t8_operator");
+    self addOption("OperatorMods", "Give Hades Operator", &GivePlayerWeapon, "lmg_spray_t8_operator");
+    self addOption("OperatorMods", "Give Titan Operator", &GivePlayerWeapon, "lmg_standard_t8_operator");
+    self addOption("OperatorMods", "Give Tigershark Operator", &GivePlayerWeapon, "lmg_stealth_t8_operator");
+    self addOption("OperatorMods", "Give Mozu Operator", &GivePlayerWeapon, "pistol_revolver_t8_operator");
+    self addOption("OperatorMods", "Give GKS Operator", &GivePlayerWeapon, "smg_accurate_t8_operator");
+    self addOption("OperatorMods", "Give Spitfire Operator", &GivePlayerWeapon, "smg_fastfire_t8_operator");
+    self addOption("OperatorMods", "Give Outlaw Operator", &GivePlayerWeapon, "sniper_fastrechamber_t8_operator");
+    self addOption("OperatorMods", "Give Vendetta Operator", &GivePlayerWeapon, "sniper_mini14_t8_operator");
+    self addOption("OperatorMods", "Give Koshka Operator", &GivePlayerWeapon, "sniper_quickscope_t8_operator");
+    self addOption("OperatorMods", "Give Swordfish Operator", &GivePlayerWeapon, "tr_longburst_t8_operator");
 
     self createMenu("Rayguns", "Raygun Varients");
     self addOption("Rayguns", "Give Raygun", &GivePlayerWeapon, "ray_gun");
@@ -48,7 +69,7 @@ WeaponsMenu(){
 
     self createMenu("WonderWeapons", "Wonder Weapons");
     if (level.CurrentMap == "wz_escape" || level.CurrentMap == "wz_escape_alt"){
-        //Add Alcatraz specific weapons here
+        //
     }
     if(Blackout())
     {
@@ -71,7 +92,7 @@ WeaponsMenu(){
     self createMenu("SubMachineGuns", "SMGs");
     self addOption("SubMachineGuns", "Give VMP", &GivePlayerWeapon, "smg_vmp_t8");
     self addOption("SubMachineGuns", "Give MicroMG", &GivePlayerWeapon, "smg_minigun_t8");
-    self addOption("SubMachineGuns", "Give MP-40", &GivePlayerWeapon, "smg_mp40_t8");
+    if(!Multiplayer()) self addOption("SubMachineGuns", "Give MP-40", &GivePlayerWeapon, "smg_mp40_t8");
     self addOption("SubMachineGuns", "Give MX9", &GivePlayerWeapon, "smg_standard_t8");
     self addOption("SubMachineGuns", "Give Saug 9mm", &GivePlayerWeapon, "smg_handling_t8");
     self addOption("SubMachineGuns", "Give Spitfire", &GivePlayerWeapon, "smg_fastfire_t8");
@@ -113,6 +134,18 @@ WeaponsMenu(){
     self addOption("Pistols", "Give KAP-45", &GivePlayerWeapon, "pistol_fullauto_t8");
     self addOption("Pistols", "Give RK 7 Garrison", &GivePlayerWeapon, "pistol_burst_t8");
     self addOption("Pistols", "Give Mozu", &GivePlayerWeapon, "pistol_revolver_t8");
+
+    self createMenu("Melee", "Melee Weapons");
+    self addOption("Melee", "Give Cha-Ching", &GivePlayerWeapon, "melee_coinbag_t8");
+    self addOption("Melee", "Give Rising Tide", &GivePlayerWeapon, "melee_cutlass_t8");
+    self addOption("Melee", "Give Nifo'oti", &GivePlayerWeapon, "melee_club_t8");
+    self addOption("Melee", "Give Series 6 Outrider", &GivePlayerWeapon, "melee_actionfigure_t8");
+    self addOption("Melee", "Give Eye of Apophis", &GivePlayerWeapon, "melee_amuletfist_t8");
+    self addOption("Melee", "Give Backhander", &GivePlayerWeapon, "melee_zombiearm_t8");
+    self addOption("Melee", "Give Full Stop", &GivePlayerWeapon, "melee_stopsign_t8");
+    self addOption("Melee", "Give Slay Bell", &GivePlayerWeapon, "melee_slaybell_t8");
+    self addOption("Melee", "Give Secret Santa", &GivePlayerWeapon, "melee_secretsanta_t8");
+    self addOption("Melee", "Give Home Wrecker", &GivePlayerWeapon, "melee_demohammer_t8");
 
     self createMenu("CamoMenu", "Camo Menu");
     self addOption("CamoMenu", "Mastery Camos", &OpenSubMenu, "MasteryCamos");

@@ -1,7 +1,6 @@
 ForgeMenu(){
     initModels();
     self createMenu("ForgeMenu", "Forge Menu");
-    self addToggleOption("ForgeMenu", "ADS Model Hash Print", &ADSModelPrint, false);
     if(Multiplayer()){
         self addOption("ForgeMenu", "Spawn Drop Tower", &SpawnDropTower, []);
         self addOption("ForgeMenu", "Spawn Merry-Go-Round", &SpawnMerryGoRound, []);
@@ -24,10 +23,29 @@ ForgeMenu(){
         self addOption("ForgeMenu", "Spawn Pot Of Gold", &SpawnModel, "p8_wz_pot_of_gold_pristine");
     }
     if(Blackout()){
+        self addOption("ForgeMenu", "Spawn Snowman", &SpawnModel, "p8_wz_ep_snowman");
         self addOption("ForgeMenu", "Spawn Mystery Box", &SpawnModelFromHash, "MysteryBox");
+        self addOption("ForgeMenu", "Spawn Medical Stash", &SpawnModelFromHash, "MedicalStash");
+        self addOption("ForgeMenu", "Spawn Skull Throne", &SpawnModel, "p8_wz_ep_skull_throne");
+        self addOption("ForgeMenu", "Spawn Money Stack", &SpawnModel, "p8_wz_ep_money_stack");
+        self addOption("ForgeMenu", "Spawn Beach Ball", &SpawnModel, "p8_wz_ep_beach_ball");
+        self addOption("ForgeMenu", "Spawn Briefcase", &SpawnModel, "p8_wz_ep_briefcase");
+        self addOption("ForgeMenu", "Spawn Jack-o-Lantern", &SpawnModel, "p8_wz_ep_jack_o_lantern");
+        self addOption("ForgeMenu", "Spawn Surfboard", &SpawnModel, "p8_wz_ep_surfboard");
+        self addOption("ForgeMenu", "Spawn Raygun Model", &SpawnModel, "p8_wz_ep_raygun");
+        self addOption("ForgeMenu", "Spawn Sword", &SpawnModel, "p8_wz_ep_sword");
+        self addOption("ForgeMenu", "Spawn Valentine Heart", &SpawnModel, "p8_wz_ep_valentine_heart");
+        self addOption("ForgeMenu", "Spawn Homonculus", &SpawnModel, "p8_wz_ep_homunculus");
+        self addOption("ForgeMenu", "Spawn Soccer Ball", &SpawnModel, "p8_wz_ep_ball_soccer");
+        self addOption("ForgeMenu", "Spawn Basketball", &SpawnModel, "p8_wz_ep_basketball");
+        self addOption("ForgeMenu", "Spawn Football", &SpawnModel, "p8_wz_ep_football");
+        self addOption("ForgeMenu", "Spawn Boombox", &SpawnModel, "p8_wz_ep_boombox_retro");
+        self addOption("ForgeMenu", "Spawn Cardboard Box", &SpawnModel, "p8_wz_ep_box_cardboard");
+        self addOption("ForgeMenu", "Spawn Pinwheel", &SpawnModel, "p8_wz_ep_pinwheel");
+        self addOption("ForgeMenu", "Spawn Hula Hoop", &SpawnModel, "p8_wz_ep_hula_hoop");
+        self addOption("ForgeMenu", "Spawn White Flag", &SpawnModel, "p8_wz_ep_white_flag");
         self addOption("ForgeMenu", "Spawn Door", &SpawnModel, "p8_wz_door_01");
         self addOption("ForgeMenu", "Spawn Wood Door", &SpawnModel, "p8_wz_door_01_wood");
-        self addOption("ForgeMenu", "Spawn Medical Stash", &SpawnModelFromHash, "MedicalStash");
     }
 }
 
@@ -361,56 +379,6 @@ MoveElevator(elevator, startPos, endPos)
         }
 
         wait 2; 
-    }
-}
-
-ADSModelPrint(){
-    self.ADSModelPrint = isDefined(self.ADSModelPrint) ? undefined : true;
- 
-    if(isDefined(self.ADSModelPrint))
-    {
-        self endon("disconnect");
- 
-        while(isDefined(self.ADSModelPrint)) 
-        {
-            self thread StartModelPrint();
-            wait 0.1;
-        }
-    }
-    else
-        self notify("StopModelPrint");
-}
-
-StartModelPrint()
-{
-    self endon("disconnect");
-    self endon("StopModelPrint");
-
-    lastModel = "";
-
-    while (isDefined(self.ADSModelPrint))
-    {
-        while (self adsbuttonpressed()) 
-        {
-            trace = bulletTrace(self GetTagOrigin("j_head"), self GetTagOrigin("j_head") + anglesToForward(self GetPlayerAngles()) * 1000000, true, self);
-            
-            if (isDefined(trace["entity"]) && isDefined(trace["entity"].model)) 
-            {
-                if (trace["entity"].model != lastModel)
-                {
-                    self iprintlnbold("Model: hash_" + trace["entity"].model);
-                    lastModel = trace["entity"].model;
-                }
-            } 
-            else if (lastModel != "No entity hit") 
-            {
-                self iprintlnbold("No entity hit");
-                lastModel = "No entity hit";
-            }
-
-            wait 0.1;
-        }
-        wait 0.05;
     }
 }
 

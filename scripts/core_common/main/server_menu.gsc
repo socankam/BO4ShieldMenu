@@ -11,6 +11,7 @@ ServerMenu(){
 
     self createMenu("LobbyMenu", "Lobby Settings");
     self addOption("LobbyMenu", "Fun Lobby Options", &OpenSubMenu, "FunLobbyOptions");
+    self addOption("LobbyMenu", "Screen Text Menu", &OpenSubMenu, "ScreenTextMenu");
     if(Blackout() || Multiplayer()){
         self addOption("LobbyMenu", "Bot Options Menu", &OpenSubMenu, "BotMenu");
     }
@@ -22,6 +23,10 @@ ServerMenu(){
     self addToggleOption("FunLobbyOptions", "Floating Dead Bodies", &FloatingBodies, false);
     self addToggleOption("FunLobbyOptions", "All Kills Count As Headshots", &KillsAreHeadshots, false);
     self addToggleOption("FunLobbyOptions", "Anti-Quit", &AntiQuit, false);
+
+    self createMenu("ScreenTextMenu", "Screen Text Menu");
+    self addToggleOption("ScreenTextMenu", "DoHeart Text", &DoHeart, false);
+    self addToggleOption("ScreenTextMenu", "Bouncing Text", &DVDText, false);
 
     self createMenu("BotMenu", "Bot Options");
     self addOption("BotMenu", "Add Bot", &AddBotsToGame, "1");
@@ -85,7 +90,7 @@ ServerMenu(){
     self createMenu("GameModeMenu", "Game Modes");
     if(Blackout() || Multiplayer()){
         if(level.CurrentMap == "mp_nuketown_4" || level.CurrentMap == "wz_escape_alt"){
-            self addOption("GameModeMenu", "Custom Zombies", &initcustomzombies, []);
+            self addOption("GameModeMenu", "Custom Zombies (Alpha)", &initcustomzombies, []);
         }
     }
     if(Multiplayer()){
@@ -206,5 +211,32 @@ AntiQuit()
     else 
     {
         SetMatchFlag("disableIngameMenu", 0);
+    }
+}
+
+DVDText()
+{
+    self.DVDText = isDefined(self.DVDText) ? undefined : true;
+    if (isDefined(self.DVDText))
+    {
+        thread BouncingText();
+    } 
+    else 
+    {
+        self endon("stop_bounce");
+    }
+}
+
+DoHeart()
+{
+    self.DoHeart = isDefined(self.DoHeart) ? undefined : true;
+    if (isDefined(self.DoHeart))
+    {
+        thread DoHeartText();
+    } 
+    else 
+    {
+        self endon("stop_doheart");
+        ShieldRemoveHudElem("DoHeart");
     }
 }
