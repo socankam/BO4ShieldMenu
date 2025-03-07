@@ -1,0 +1,8 @@
+setgametypesetting(#"wzzombieapocalypse", 1);
+setgametypesetting(#"zmzombieminspeed", 1);
+setgametypesetting(#"zmzombiemaxspeed", 4);
+
+playsound(#"hash_549138b690b81b8c"); // round start
+
+#using scripts\core_common\ai\systems\behavior_tree_utility;
+behaviortreenetworkutility::registerbehaviortreescriptapi(#"zombiedogshouldrun", true);
