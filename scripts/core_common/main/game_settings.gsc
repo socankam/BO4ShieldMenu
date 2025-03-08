@@ -23,6 +23,9 @@ SetGametypeSettings()
         setGametypeSetting(#"wzzombies", 1);
         setGametypeSetting(#"wzminibosses", 1);
         setGametypeSetting(#"wzspawnanywhere", 1);
+        setgametypesetting(#"zmzombieminspeed", 1);
+        setgametypesetting(#"zmzombiemaxspeed", 4);
+        setgametypesetting(#"wzzombieapocalypse", 1);
         setGametypeSetting(#"wzbrutuseverywhere", 1);
         setGametypeSetting(#"wzzombieapocalypse", 1);
         setGametypeSetting(#"wzzombiesspawnammo", 1);
