@@ -435,12 +435,7 @@ SpawnNewHellhound(player)
     Hellhound.var_35eedf58 = 0;
     Hellhound.var_ef59b90 = 3;
 
-    Hellhounds = getaiteamarray(#"world");
-    foreach(CurrentHellhound in Hellhounds) {
-        CurrentHellhound.zombie_move_speed = "run";
-    }
-
-    thread MonitorZombie(Hellhound, player);
+    Hellhound ai::set_behavior_attribute("sprint", 1");
 }
 
 TrySpawnBrutus()
